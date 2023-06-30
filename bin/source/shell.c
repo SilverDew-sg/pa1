@@ -189,7 +189,15 @@ char *read_line_stdin(void)
   // DO NOT PRINT ANYTHING TO THE OUTPUT
 
   /***** BEGIN ANSWER HERE *****/
-
+  if (line == NULL){
+    perror("Memory allocation for getline failed!");
+    exit(1);
+  }
+  ssize_t read_line = getline(&line,&buf_size,stdin);
+  if (read_line == -1){
+    perror("Failed to read line!");
+    exit(1);
+  }
   /*********************/
 
   return line;
@@ -213,7 +221,23 @@ char **tokenize_line_stdin(char *line)
   // 3. Store the address to first letter of each word in the command in tokens
   // 4. Add NULL termination in tokens so we know how many "valid" addresses there are in tokens
   /***** BEGIN ANSWER HERE *****/
+  if (tokens == NULL){
+    perror("char ** returned NULL");
+    exit(1);
+  }
+  token = strtok(line," \t\r\n");
+  while (token != NULL){
+    tokens[position] = token;
+    position += 1;
 
+    //double check that the buffer has not overflown
+    if (position >= buf_size){
+      perror("Buffer size exceeded!");
+      exit(1);
+    }
+    token = strtok(NULL," \t\r\n");
+    tokens[position] = NULL;
+  }
   /*********************/
 
   return tokens;
@@ -264,8 +288,32 @@ void main_loop(void)
     /*********************/
   } while (status);
 }
-
+/**Test 1: 
 int main(int argc, char **argv)
+{
+
+ char* line = read_line_stdin();
+ printf("The fetched line is : %s \n", line);
+
+ return 0;
+}
+*/
+int main(int argc, char **argv)
+{
+
+ printf("Shell Run successful. Running now: \n");
+
+ char* line = read_line_stdin();
+ printf("The fetched line is : %s \n", line);
+
+ char** args = tokenize_line_stdin(line);
+ printf("The first token is %s \n", args[0]);
+ printf("The second token is %s \n", args[1]);
+
+ return 0;
+}
+
+/**int main(int argc, char **argv)
 {
 
   printf("CSEShell Run successful. Running now: \n");
@@ -286,3 +334,4 @@ int main(int argc, char **argv)
 
   return 0;
 }
+*/
